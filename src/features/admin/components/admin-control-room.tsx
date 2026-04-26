@@ -27,6 +27,7 @@ type AdminControlRoomProps = {
 };
 
 type AdminTab = "overview" | "users" | "reservations" | "availability" | "audit";
+type ResourceBlockType = "OFFICE" | AdminDashboard["resourceTargets"][number]["type"];
 
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   weekday: "short",
@@ -64,6 +65,11 @@ function SummaryCard({
 
 export function AdminControlRoom({ dashboard, filters }: AdminControlRoomProps) {
   const [tab, setTab] = useState<AdminTab>(filters.tab);
+  const [resourceBlockType, setResourceBlockType] = useState<ResourceBlockType>("SEAT");
+  const resourceBlockTargets =
+    resourceBlockType === "OFFICE"
+      ? []
+      : dashboard.resourceTargets.filter((target) => target.type === resourceBlockType);
 
   const tabs: Array<{ id: AdminTab; label: string }> = [
     { id: "overview", label: "Overview" },
@@ -461,7 +467,8 @@ export function AdminControlRoom({ dashboard, filters }: AdminControlRoomProps) 
                   Type
                   <select
                     name="blockType"
-                    defaultValue="SEAT"
+                    value={resourceBlockType}
+                    onChange={(event) => setResourceBlockType(event.target.value as ResourceBlockType)}
                     className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium normal-case tracking-normal text-[var(--color-text)]"
                   >
                     <option value="OFFICE">OFFICE</option>
@@ -473,11 +480,16 @@ export function AdminControlRoom({ dashboard, filters }: AdminControlRoomProps) 
                 <label className="grid gap-1 text-xs font-bold uppercase tracking-wide text-[var(--color-text-muted)]">
                   Target
                   <select
+                    key={resourceBlockType}
                     name="targetId"
                     className="min-h-10 rounded-md border border-[var(--color-border)] bg-white px-3 text-sm font-medium normal-case tracking-normal text-[var(--color-text)]"
                   >
-                    <option value="">Whole office</option>
-                    {dashboard.resourceTargets.map((target) => (
+                    <option value="">
+                      {resourceBlockType === "OFFICE"
+                        ? "Whole office"
+                        : `Choose ${resourceBlockType.toLowerCase()}`}
+                    </option>
+                    {resourceBlockTargets.map((target) => (
                       <option key={`${target.type}-${target.id}`} value={target.id}>
                         {target.type} / {target.label}
                       </option>
