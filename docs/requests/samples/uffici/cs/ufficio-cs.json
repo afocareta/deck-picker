@@ -1,0 +1,18 @@
+{
+    "name": "Ufficio Cosenza",
+    "location": "Via Pedro Alvares Cabral, 6, 87036 Rende",
+    "floors": [
+      {
+        "floor_num": 1,
+        "floor_name": "Piano terra",
+        "floor_map": "floor-cs.webp",
+        "desks": [
+          {
+            "desk_num": 1,
+            "desk_name": "CS-DESK",
+            "seats": [{ "seat_num": 1 },{ "seat_num": 2 },{ "seat_num": 3 },{ "seat_num": 4 },{ "seat_num": 5 },{ "seat_num": 6 },{ "seat_num": 7 },{ "seat_num": 8 },{ "seat_num": 9 },{ "seat_num": 10 },{ "seat_num": 11 },{ "seat_num": 12 }]
+          }
+        ]
+      }
+    ]
+  }

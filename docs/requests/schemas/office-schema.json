@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://desk-picker.local/schemas/office-schema.json",
+  "title": "Desk Picker Office Configuration",
+  "description": "Schema for office layout JSON uploads. Derived from the provided office samples.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "location", "floors"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "description": "Human-readable office name, for example Ufficio Roma."
+    },
+    "location": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250,
+      "description": "Office address or location text used in the UI and calendar fallback events."
+    },
+    "floors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/floor"
+      }
+    }
+  },
+  "$defs": {
+    "floor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["floor_num", "floor_name", "floor_map", "desks"],
+      "properties": {
+        "floor_num": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200,
+          "description": "Stable floor number used for layout migration matching."
+        },
+        "floor_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "floor_map": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180,
+          "pattern": "^[^/\\\\]+\\.(jpg|jpeg|png|webp)$",
+          "description": "Floor plan image filename uploaded together with the office JSON."
+        },
+        "desks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/desk"
+          }
+        }
+      }
+    },
+    "desk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["desk_num", "desk_name", "seats"],
+      "properties": {
+        "desk_num": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "Stable desk number used for layout migration matching within a floor."
+        },
+        "desk_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "seats": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/seat"
+          }
+        }
+      }
+    },
+    "seat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seat_num"],
+      "properties": {
+        "seat_num": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "Stable seat number used for layout migration matching within a desk."
+        }
+      }
+    }
+  }
+}

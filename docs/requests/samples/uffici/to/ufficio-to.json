@@ -1,0 +1,28 @@
+{
+    "name": "Ufficio Torino",
+    "location": "Corso Moncalieri, 506/28, 10133 Torino",
+    "floors": [
+      {
+        "floor_num": 1,
+        "floor_name": "Piano terra",
+        "floor_map": "floor-to.webp",
+        "desks": [
+          {
+            "desk_num": 1,
+            "desk_name": "TO-DESK",
+            "seats": [{ "seat_num": 1 },{ "seat_num": 2 },{ "seat_num": 3 },{ "seat_num": 4 }]
+          },
+          {
+            "desk_num": 2,
+            "desk_name": "TO-DESK-A",
+            "seats": [{ "seat_num": 1 },{ "seat_num": 2 }]
+          },
+          {
+            "desk_num": 3,
+            "desk_name": "TO-DESK-B",
+            "seats": [{ "seat_num": 1 },{ "seat_num": 2 }]
+          }
+        ]
+      }
+    ]
+  }

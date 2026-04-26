@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Desk Picker - Booking Wizard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#8a1c00",
+                    "on-tertiary-container": "#fcfcff",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#f8dcd6",
+                    "on-primary-fixed": "#3c0700",
+                    "error": "#ba1a1a",
+                    "outline": "#8e7069",
+                    "secondary": "#625d59",
+                    "on-secondary-container": "#69635f",
+                    "secondary-container": "#e9e1db",
+                    "inverse-surface": "#3d2c28",
+                    "inverse-on-surface": "#ffede9",
+                    "surface-tint": "#b32902",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface-variant": "#5a413a",
+                    "tertiary": "#006192",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#91cdff",
+                    "on-surface": "#271814",
+                    "surface-bright": "#fff8f6",
+                    "surface": "#fff8f6",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#271814",
+                    "on-secondary-fixed": "#1e1b18",
+                    "on-primary-container": "#fffbff",
+                    "primary-fixed-dim": "#ffb4a2",
+                    "surface-container-low": "#fff1ed",
+                    "background": "#fff8f6",
+                    "on-tertiary-fixed": "#001e31",
+                    "secondary-fixed-dim": "#ccc5bf",
+                    "on-secondary-fixed-variant": "#4a4642",
+                    "primary-container": "#d3401a",
+                    "primary": "#b02700",
+                    "outline-variant": "#e3beb6",
+                    "surface-container-high": "#fee2dc",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#004b72",
+                    "surface-container-highest": "#f8dcd6",
+                    "surface-container": "#ffe9e4",
+                    "surface-dim": "#f0d4ce",
+                    "tertiary-container": "#007bb8",
+                    "secondary-fixed": "#e9e1db",
+                    "primary-fixed": "#ffdad2",
+                    "tertiary-fixed": "#cce5ff",
+                    "inverse-primary": "#ffb4a2",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-padding": "24px",
+                    "control-padding-y": "8px",
+                    "unit": "4px",
+                    "control-padding-x": "12px",
+                    "panel-gap": "16px",
+                    "table-cell-padding": "8px 12px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "h1": ["Inter"],
+                    "h2": ["Inter"],
+                    "label-md": ["Inter"],
+                    "h3": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #d1d9dd; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background antialiased flex">
+<!-- SideNavBar (Authority Source: JSON) -->
+<aside class="bg-[#3d3935] flex flex-col h-full w-64 z-40 overflow-y-auto fixed left-0 top-0 h-screen border-r border-gray-800">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">chair_alt</span>
+</div>
+<div>
+<h1 class="text-white font-black uppercase text-sm">Desk Picker</h1>
+<p class="text-gray-400 text-[10px] uppercase tracking-widest">Internal Ops</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 mt-4">
+<!-- Map Tab -->
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 font-body-md text-[13px] font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="floor_plan">floor</span>
+                Map
+            </a>
+<!-- Bookings Tab (Active State Logic) -->
+<a class="flex items-center text-white border-l-4 border-orange-600 bg-white/5 py-3 px-4 font-body-md text-[13px] font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3 text-orange-600" data-icon="event_available">event_available</span>
+                Bookings
+            </a>
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 font-body-md text-[13px] font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="group">group</span>
+                People
+            </a>
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 font-body-md text-[13px] font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="inventory_2">inventory_2</span>
+                Resources
+            </a>
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 font-body-md text-[13px] font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="monitoring">monitoring</span>
+                Analytics
+            </a>
+</nav>
+<div class="mt-auto p-4 border-t border-gray-800">
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 font-body-md text-[13px] font-medium tracking-tight" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="contact_support">contact_support</span>
+                Support
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 min-h-screen flex flex-col">
+<!-- TopNavBar (Authority Source: JSON) -->
+<header class="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shadow-[0px_2px_4px_rgba(61,57,53,0.05)] flex justify-between items-center px-4 w-full h-14 sticky top-0 z-30">
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-gray-50 border border-gray-200 rounded px-2 py-1 gap-2 w-80">
+<span class="material-symbols-outlined text-gray-400 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm p-0 w-full placeholder:text-gray-400" placeholder="Search floors, desks, or colleagues..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full ml-2 border border-gray-200 overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close up portrait of a professional man in a business setting with soft natural office lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuT-Dumr-yhTRivomX4EqcMJxdR5zrBMKhMxv7OZ2g9WdcW7VCCat3fi14E9i8T81ztIBk6-mrZlUBjtm_NUxgI3Dml0kyl1H0vSEM9w9ZUM1ZMxgl_xRefENnlUPK-Kqjm4sU0J5MeUfCzZzAFgLeAjjiEV4XyozIyQb8Q-FAENkilUV8hmnhMT7OZO-F0011nOdZUtrraeH5hEm21rz3tQ5FvGAQKrI1DxzT0SIDTwbAOt8-eVxwDQF0TeDhYLUBC7kM58cu_7M"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-6 flex-1 bg-[#f9fafb]">
+<!-- Wizard Stepper -->
+<div class="mb-8 flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-secondary text-white flex items-center justify-center text-[10px] font-bold">1</span>
+<span class="text-label-md text-secondary">Preferences</span>
+</div>
+<div class="h-[1px] w-12 bg-gray-300"></div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold">2</span>
+<span class="text-label-md text-primary">Selection</span>
+</div>
+<div class="h-[1px] w-12 bg-gray-300"></div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center text-[10px] font-bold">3</span>
+<span class="text-label-md text-gray-400">Confirmation</span>
+</div>
+</div>
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="font-h1 text-h1 text-on-surface">Select Your Workspace</h2>
+<p class="font-body-md text-body-md text-secondary">Floor 4, Engineering Wing • Tuesday, Oct 24</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-white border border-gray-300"></span>
+<span class="text-label-sm text-secondary">Available</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-gray-200 border border-gray-200"></span>
+<span class="text-label-sm text-secondary">Occupied</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-orange-100 border border-orange-600"></span>
+<span class="text-label-sm text-secondary">Selected</span>
+</div>
+</div>
+</div>
+<!-- Main Layout: Floor Map + Table -->
+<div class="grid grid-cols-12 gap-6 items-start">
+<!-- Floor Map Reference (Left) -->
+<div class="col-span-8 bg-white border border-[#d1d9dd] rounded-lg p-4 h-[600px] relative overflow-hidden flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<span class="text-label-md uppercase tracking-wider text-gray-400">Live Floor Visualizer</span>
+<div class="flex gap-1">
+<button class="p-1 hover:bg-gray-100 rounded border border-gray-200"><span class="material-symbols-outlined text-sm">zoom_in</span></button>
+<button class="p-1 hover:bg-gray-100 rounded border border-gray-200"><span class="material-symbols-outlined text-sm">zoom_out</span></button>
+<button class="p-1 hover:bg-gray-100 rounded border border-gray-200"><span class="material-symbols-outlined text-sm">filter_list</span></button>
+</div>
+</div>
+<div class="flex-1 rounded border border-gray-100 bg-[#fcfcfc] relative">
+<!-- Map Image -->
+<img class="w-full h-full object-cover opacity-20 absolute inset-0" data-alt="Technical architectural blueprint of a modern office floor plan showing desk clusters and conference rooms in a minimalist aesthetic" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArwqEP1_M-6BJsFE2ycVL2bmULSroIXwdqcNKLklKIFp9me3tEAR1heNu7I2kwkFBuRVs2qoXznME2fEbv355cXtUklj3l3RCXoYA1sKxCCwDijjU3qy5UTz-CbZvQhYzH2jFS54G68JepnYOXFJULmCK-GLxTzF5Zbu6-lUJgI2hVm0pbDpVfR1KAVeTZAofWWUVn1vcr9kNeCx3QVILp8WaHqV_MQu22Ip7uS849CyoywQrU-zhs5kM0MLiodG2h3BK27roh4-k"/>
+<!-- Interactive Desk Mockups -->
+<!-- Cluster 1 -->
+<div class="absolute top-20 left-40 grid grid-cols-2 gap-2">
+<div class="w-10 h-8 border border-[#d1d9dd] bg-gray-200 flex items-center justify-center text-[10px] text-gray-500">401</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">402</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">403</div>
+<div class="w-10 h-8 border border-primary bg-orange-50 flex items-center justify-center text-[10px] text-primary font-bold">404</div>
+</div>
+<!-- Cluster 2 -->
+<div class="absolute top-60 left-80 grid grid-cols-3 gap-2">
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">412</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">413</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-gray-200 flex items-center justify-center text-[10px] text-gray-500">414</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">415</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">416</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-gray-200 flex items-center justify-center text-[10px] text-gray-500">417</div>
+</div>
+<!-- Cluster 3 -->
+<div class="absolute bottom-20 right-40 grid grid-cols-2 gap-2">
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">441</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-gray-200 flex items-center justify-center text-[10px] text-gray-500">442</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">443</div>
+<div class="w-10 h-8 border border-[#d1d9dd] bg-white flex items-center justify-center text-[10px] text-gray-700 cursor-pointer hover:border-primary">444</div>
+</div>
+<!-- Amenities -->
+<div class="absolute top-10 right-10 bg-gray-100 p-4 border border-dashed border-gray-300 w-32 h-20 flex items-center justify-center">
+<span class="text-label-sm text-gray-400">Lounge Area</span>
+</div>
+</div>
+</div>
+<!-- Seat Availability & Selection (Right) -->
+<div class="col-span-4 space-y-6">
+<!-- Reservation Summary Card -->
+<div class="bg-white border border-[#d1d9dd] rounded-lg p-6 shadow-[0px_2px_4px_rgba(61,57,53,0.05)]">
+<h3 class="font-h3 text-h3 text-on-surface mb-4">Reservation Details</h3>
+<div class="space-y-3">
+<div class="flex justify-between items-center py-2 border-b border-gray-100">
+<span class="text-body-sm text-secondary">Selected Desk</span>
+<span class="text-body-sm font-bold text-primary">Desk 404</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-gray-100">
+<span class="text-body-sm text-secondary">Location</span>
+<span class="text-body-sm font-medium">South-West Wing</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-gray-100">
+<span class="text-body-sm text-secondary">Equipment</span>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-xs text-secondary">monitor</span>
+<span class="material-symbols-outlined text-xs text-secondary">keyboard</span>
+<span class="material-symbols-outlined text-xs text-secondary">power</span>
+</div>
+</div>
+</div>
+<div class="mt-8 space-y-3">
+<button class="w-full bg-[#e34b25] text-white py-3 px-4 rounded-lg font-h3 hover:bg-[#b02700] transition-colors flex items-center justify-center gap-2">
+                                Confirm Reservation
+                                <span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+<button class="w-full border border-[#d1d9dd] text-[#3d3935] py-3 px-4 rounded-lg font-h3 hover:bg-gray-50 transition-colors">
+                                Back to Step 1
+                            </button>
+</div>
+</div>
+<!-- Available Desks Table -->
+<div class="bg-white border border-[#d1d9dd] rounded-lg overflow-hidden flex flex-col h-[300px]">
+<div class="bg-[#3d3935] px-4 py-2 flex justify-between items-center">
+<span class="text-white text-label-md">Available Desks</span>
+<span class="text-gray-400 text-label-sm">Total: 12</span>
+</div>
+<div class="overflow-y-auto flex-1">
+<table class="w-full border-collapse">
+<thead class="sticky top-0 bg-white shadow-sm">
+<tr class="text-left">
+<th class="p-3 text-label-sm text-secondary border-b border-gray-100">Desk ID</th>
+<th class="p-3 text-label-sm text-secondary border-b border-gray-100">Proximity</th>
+<th class="p-3 text-label-sm text-secondary border-b border-gray-100">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="hover:bg-gray-50 border-b border-gray-50">
+<td class="p-3 text-body-sm font-medium">402</td>
+<td class="p-3 text-body-sm text-secondary">Near Window</td>
+<td class="p-3"><button class="text-primary text-label-md hover:underline">Select</button></td>
+</tr>
+<tr class="bg-[#3d3935]/[0.02] hover:bg-gray-50 border-b border-gray-50">
+<td class="p-3 text-body-sm font-medium">403</td>
+<td class="p-3 text-body-sm text-secondary">Near Kitchen</td>
+<td class="p-3"><button class="text-primary text-label-md hover:underline">Select</button></td>
+</tr>
+<tr class="hover:bg-gray-50 border-b border-gray-50">
+<td class="p-3 text-body-sm font-medium">412</td>
+<td class="p-3 text-body-sm text-secondary">Quiet Zone</td>
+<td class="p-3"><button class="text-primary text-label-md hover:underline">Select</button></td>
+</tr>
+<tr class="bg-[#3d3935]/[0.02] hover:bg-gray-50 border-b border-gray-50">
+<td class="p-3 text-body-sm font-medium">413</td>
+<td class="p-3 text-body-sm text-secondary">Standing Desk</td>
+<td class="p-3"><button class="text-primary text-label-md hover:underline">Select</button></td>
+</tr>
+<tr class="hover:bg-gray-50 border-b border-gray-50">
+<td class="p-3 text-body-sm font-medium">415</td>
+<td class="p-3 text-body-sm text-secondary">Corner</td>
+<td class="p-3"><button class="text-primary text-label-md hover:underline">Select</button></td>
+</tr>
+<tr class="bg-[#3d3935]/[0.02] hover:bg-gray-50 border-b border-gray-50">
+<td class="p-3 text-body-sm font-medium">416</td>
+<td class="p-3 text-body-sm text-secondary">Standard</td>
+<td class="p-3"><button class="text-primary text-label-md hover:underline">Select</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- System Footer -->
+<footer class="h-12 border-t border-gray-200 bg-white flex items-center justify-between px-6">
+<div class="flex gap-4">
+<span class="text-label-sm text-gray-400">System Status: <span class="text-green-600 font-bold">Operational</span></span>
+<span class="text-label-sm text-gray-400">Version 2.4.0-build.82</span>
+</div>
+<div class="flex gap-4">
+<a class="text-label-sm text-gray-400 hover:text-secondary" href="#">Privacy Policy</a>
+<a class="text-label-sm text-gray-400 hover:text-secondary" href="#">Admin Console</a>
+</div>
+</footer>
+</main>
+</body></html>

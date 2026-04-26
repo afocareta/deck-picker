@@ -1,0 +1,57 @@
+{
+  "name": "desk-picker",
+  "version": "1.0.0",
+  "description": "Desk Picker planning and design workspace",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "assets:offices": "node scripts/copy-office-assets.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "gcloud": "CLOUDSDK_CONFIG=.gcloud tools/google-cloud/bin/gcloud",
+    "mcp:superpowers": "node tools/mcp/superpowers-mcp/build/index.js",
+    "mcp:stitch": "CLOUDSDK_CONFIG=.gcloud node node_modules/stitch-mcp/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "25.6.0",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.4",
+    "stitch-mcp": "^1.3.2",
+    "tsx": "^4.21.0"
+  },
+  "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "@tailwindcss/postcss": "^4.2.4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "ajv": "^8.20.0",
+    "autoprefixer": "^10.5.0",
+    "jsdom": "^29.0.2",
+    "lucide-react": "^1.11.0",
+    "next": "^16.2.4",
+    "playwright": "^1.59.1",
+    "postcss": "^8.5.10",
+    "prisma": "^7.8.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5",
+    "zod": "^4.3.6"
+  }
+}

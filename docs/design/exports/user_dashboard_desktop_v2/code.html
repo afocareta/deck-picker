@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Desk Picker | User Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#8a1c00",
+                        "on-tertiary-container": "#fcfcff",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#f8dcd6",
+                        "on-primary-fixed": "#3c0700",
+                        "error": "#ba1a1a",
+                        "outline": "#8e7069",
+                        "secondary": "#625d59",
+                        "on-secondary-container": "#69635f",
+                        "secondary-container": "#e9e1db",
+                        "inverse-surface": "#3d2c28",
+                        "inverse-on-surface": "#ffede9",
+                        "surface-tint": "#b32902",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#5a413a",
+                        "tertiary": "#006192",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#91cdff",
+                        "on-surface": "#271814",
+                        "surface-bright": "#fff8f6",
+                        "surface": "#fff8f6",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#271814",
+                        "on-secondary-fixed": "#1e1b18",
+                        "on-primary-container": "#fffbff",
+                        "primary-fixed-dim": "#ffb4a2",
+                        "surface-container-low": "#fff1ed",
+                        "background": "#fff8f6",
+                        "on-tertiary-fixed": "#001e31",
+                        "secondary-fixed-dim": "#ccc5bf",
+                        "on-secondary-fixed-variant": "#4a4642",
+                        "primary-container": "#d3401a",
+                        "primary": "#b02700",
+                        "outline-variant": "#e3beb6",
+                        "surface-container-high": "#fee2dc",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004b72",
+                        "surface-container-highest": "#f8dcd6",
+                        "surface-container": "#ffe9e4",
+                        "surface-dim": "#f0d4ce",
+                        "tertiary-container": "#007bb8",
+                        "secondary-fixed": "#e9e1db",
+                        "primary-fixed": "#ffdad2",
+                        "tertiary-fixed": "#cce5ff",
+                        "inverse-primary": "#ffb4a2",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-padding": "24px",
+                        "control-padding-y": "8px",
+                        "unit": "4px",
+                        "control-padding-x": "12px",
+                        "panel-gap": "16px",
+                        "table-cell-padding": "8px 12px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "h1": ["Inter"],
+                        "h2": ["Inter"],
+                        "label-md": ["Inter"],
+                        "h3": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f3f4f6; /* Force light gray background for content area */
+        }
+    </style>
+</head>
+<body class="flex min-h-screen font-body-md text-on-background">
+<!-- SideNavBar (Authority: JSON & Style Guidance) -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-[#3d3935] flex flex-col z-40 overflow-y-auto border-r border-gray-800">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-8 h-8 bg-[#e34b25] flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-white" data-icon="desk">desk</span>
+</div>
+<div>
+<div class="text-white font-black uppercase text-sm leading-none">Desk Picker</div>
+<div class="text-gray-400 text-[11px] font-medium tracking-tight mt-1">Internal Ops</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<!-- Map (Active) -->
+<a class="flex items-center text-white border-l-4 border-[#e34b25] bg-white/5 py-3 px-4 transition-all duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined mr-3 text-white" data-icon="floor_plan">floor</span>
+<span class="font-['Inter'] text-[13px] font-medium tracking-tight">Map</span>
+</a>
+<!-- Bookings -->
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 active:bg-orange-600/20 cursor-pointer" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="event_available">event_available</span>
+<span class="font-['Inter'] text-[13px] font-medium tracking-tight">Bookings</span>
+</a>
+<!-- People -->
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 active:bg-orange-600/20 cursor-pointer" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="group">group</span>
+<span class="font-['Inter'] text-[13px] font-medium tracking-tight">People</span>
+</a>
+<!-- Resources -->
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 active:bg-orange-600/20 cursor-pointer" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="inventory_2">inventory_2</span>
+<span class="font-['Inter'] text-[13px] font-medium tracking-tight">Resources</span>
+</a>
+<!-- Analytics -->
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 active:bg-orange-600/20 cursor-pointer" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="monitoring">monitoring</span>
+<span class="font-['Inter'] text-[13px] font-medium tracking-tight">Analytics</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6">
+<button class="w-full bg-[#e34b25] text-white py-3 px-4 rounded-lg font-['Inter'] text-[13px] font-bold uppercase tracking-wider mb-6 flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="add_circle">add_circle</span>
+                Quick Reserve
+            </button>
+<a class="flex items-center text-gray-400 hover:text-white py-3 px-4 hover:bg-white/10 transition-all duration-150 cursor-pointer border-t border-gray-800 pt-6" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="contact_support">contact_support</span>
+<span class="font-['Inter'] text-[13px] font-medium tracking-tight">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen">
+<!-- TopNavBar (Authority: JSON) -->
+<header class="flex justify-between items-center px-6 w-full h-14 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shadow-[0px_2px_4px_rgba(61,57,53,0.05)] sticky top-0 z-30">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]" data-icon="search">search</span>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-md pl-10 pr-4 py-1.5 font-body-sm focus:ring-2 focus:ring-[#e34b25] focus:border-transparent transition-all outline-none" placeholder="Search desks or people..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-gray-200"></div>
+<div class="flex items-center gap-3 cursor-pointer">
+<div class="text-right">
+<div class="font-label-md text-on-surface leading-none">Marcus Reed</div>
+<div class="font-label-sm text-secondary">Product Design</div>
+</div>
+<img alt="User profile" class="w-9 h-9 rounded-full object-cover border border-gray-200" data-alt="professional headshot of a designer in a modern studio environment with neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARKtP5bKW_2oEQVXnjumRuUj9Isku0_nBYPsNqS_FcRwWBb9umDAPRBhhenJszgZxZTqE_ECKcYk0WAU6t5iWsoLVkbLEQZ9I5YfqkBL7WXTXi7njgCw73w9AmDh8wg6cO03JP0rSjYa2e6aZrZPhgr2boTOqs5hHGDH1c0hhTXLZiChV775vJBTc3ujcJcEEB7hXY_IqyVFmOl8wM67Snw1oB_ZXJ7aEbIhIITjUzttvud2d0Np29wn1UIoGlUfki2Z2xW1mIIDg"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-container-padding flex-1 space-y-panel-gap">
+<!-- Page Header -->
+<div class="flex items-end justify-between">
+<div>
+<h1 class="font-h1 text-on-surface">Workspace Dashboard</h1>
+<p class="font-body-md text-secondary mt-1">London HQ - Floor 4 Overview</p>
+</div>
+<button class="bg-[#e34b25] text-white px-control-padding-x py-control-padding-y rounded-lg font-h3 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+                    Book a Spot
+                </button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-panel-gap">
+<!-- Occupancy Metrics (Authority: Style Guidance "Status Chips") -->
+<div class="col-span-12 md:col-span-3 bg-white border border-[#d1d9dd] rounded-lg p-panel-gap flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-secondary uppercase tracking-tight">Today's Occupancy</span>
+<span class="material-symbols-outlined text-[#e34b25]" data-icon="sensors">sensors</span>
+</div>
+<div class="font-h1 text-[#b32902]">78%</div>
+<div class="font-body-sm text-secondary mt-1">156 / 200 desks active</div>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2">
+<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-label-sm">Healthy</span>
+<span class="font-label-sm text-secondary">Within peak capacity</span>
+</div>
+</div>
+<div class="col-span-12 md:col-span-3 bg-white border border-[#d1d9dd] rounded-lg p-panel-gap flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-secondary uppercase tracking-tight">Active Team</span>
+<span class="material-symbols-outlined text-tertiary" data-icon="groups">groups</span>
+</div>
+<div class="font-h1 text-on-surface">24</div>
+<div class="font-body-sm text-secondary mt-1">Product &amp; Design present</div>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-100">
+<div class="flex -space-x-2">
+<img alt="" class="w-6 h-6 rounded-full border-2 border-white" data-alt="woman portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeUnE7hnJMwy9yY9yB4RmOo2HZ340mnyOzZUzSzA1UilTP6NNPLZJMJSMjkt4Hf46Xgg6CQnhFA-0jFqgXaHhbiF9wDOIKHFZeqjKcVaWXOuHiki3u7OAo5LKjNHXuz2wdo0P0VVv6IYYAagXRBYHO45MjBKRBNu0tg6GpTt3XvIqkDyWvNoRQ7la5mUeoF6H3dkS073uIZu1dsv_BzZBE1g9cxKOIOjRebPO5ISrEyAYYN09LEnu9-5-3UaUv24X_wFgEVKNG51U"/>
+<img alt="" class="w-6 h-6 rounded-full border-2 border-white" data-alt="man portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkVw3tkuHxpNRBHoLdTT2GmkPfnHBJFqm7MW-ZJULjpOENT-r9IQOn_0QXX7tC8EJnCZFRwdlCO5_lJQFnN0Oi8KU-GdYRPuYmYO8kc0iNwaONEmjwYd1Yl03mmKiJjyGvP1Fhs9aSKJR_jeoERCfZt3QRVeQMhVeZkoZQ29kw0mXa1suF03N2AX1VoitjhkKcDCVyevE7ek4C7ldxXao237fdRj0kgAR1Wl7j7FpoDZ1qvbOc7kQlQoV3C7bB_Zam7ADlS3ZFiSs"/>
+<img alt="" class="w-6 h-6 rounded-full border-2 border-white" data-alt="woman portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9N6sapLLn96pr3pYS7VJC3yWArRf9ggucX7cQ9xBdjGreFS3bwaPGR4O4stNa4RbeYPlGJ5T4cQW0oZpnL4_-q3Jj5WDx9pD81XefhjK8GmVTANUed8KfNHzQ28sxVxUDofmmsLPKkLT14hEO-fkeRYdujyeKvG1L9GWkRZg8grA2Jqb9x003dNEqKcl-UV1EHGle4RJ0gEQElNkMgdSQgyRE68eoN_4cjIlwvB-slbT3IBlOD1uQvqstGGASZyYP-R-VpAp5PvY"/>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center font-label-sm text-gray-500">+21</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-6 bg-white border border-[#d1d9dd] rounded-lg overflow-hidden flex">
+<div class="p-panel-gap flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label-md text-secondary uppercase tracking-tight">Map Pulse</span>
+<h3 class="font-h3 mt-1">Zone B Hotspots</h3>
+<p class="font-body-sm text-secondary mt-2">Quiet areas are 90% full. Common spaces available in North Wing.</p>
+</div>
+<div class="mt-4 flex gap-3">
+<button class="bg-[#3d3935] text-white px-3 py-1.5 rounded text-body-sm hover:bg-black transition-colors">View Map</button>
+<button class="border border-[#d1d9dd] text-[#3d3935] px-3 py-1.5 rounded text-body-sm hover:bg-gray-50">Manage Zones</button>
+</div>
+</div>
+<div class="w-48 bg-gray-100 flex items-center justify-center border-l border-[#d1d9dd]">
+<img alt="Map Preview" class="w-full h-full object-cover opacity-60" data-alt="abstract architectural blueprint of a modern office floor plan with orange highlighted zones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANTDc4zlHSrDHQnPB5k8u90CubL0L9XqAgn0G4--mDIl3Y03oMtSyY0G0sFhXvNUxovQIIhEyg8rpMlYi7tw659l2ce9pTtA9XT4lgEvyGNxFafS3ML6FHZhs1XxNEkD9IM_qCQBZ3aTRWG81AbuiQB7DmIv3mQHEl9dKsuSgwibxqkPM2szjvya65_CdBt-Ox-9czXnfe9UDo4IeiVovDrBii61WJMrKknUFtsthPKtDsdCak6OGaDk-uU03QVrnTz1YC1yDK5KE"/>
+</div>
+</div>
+<!-- Upcoming Reservations Table (Authority: Data Tables Guidance) -->
+<div class="col-span-12 bg-white border border-[#d1d9dd] rounded-lg shadow-[0px_2px_4px_rgba(61,57,53,0.05)] overflow-hidden">
+<div class="px-panel-gap py-4 border-b border-[#d1d9dd] flex items-center justify-between bg-white">
+<h3 class="font-h3">Upcoming Reservations</h3>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-secondary">Sort by:</span>
+<select class="border-none bg-transparent font-label-sm text-on-surface focus:ring-0 cursor-pointer">
+<option>Date (Ascending)</option>
+<option>Zone</option>
+</select>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="bg-[#3d3935] text-white">
+<th class="font-label-md uppercase text-left p-table-cell-padding">Resource</th>
+<th class="font-label-md uppercase text-left p-table-cell-padding">Date &amp; Time</th>
+<th class="font-label-md uppercase text-left p-table-cell-padding">Location / Zone</th>
+<th class="font-label-md uppercase text-left p-table-cell-padding">Status</th>
+<th class="font-label-md uppercase text-right p-table-cell-padding">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#d1d9dd] font-body-sm">
+<!-- Row 1 -->
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="p-table-cell-padding">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#e34b25]" data-icon="desktop_windows">desktop_windows</span>
+<div>
+<div class="font-h3 text-on-surface">Desk 4-12</div>
+<div class="text-[11px] text-secondary">Adjustable Standing</div>
+</div>
+</div>
+</td>
+<td class="p-table-cell-padding">
+<div>Oct 24, 2023</div>
+<div class="text-[11px] text-secondary">08:00 AM - 05:00 PM</div>
+</td>
+<td class="p-table-cell-padding">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span>
+<span>Zone B (Quiet Zone)</span>
+</div>
+</td>
+<td class="p-table-cell-padding">
+<span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-label-sm">Confirmed</span>
+</td>
+<td class="p-table-cell-padding text-right">
+<button class="text-secondary hover:text-[#e34b25] p-1"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="text-secondary hover:text-error p-1 ml-2"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+</td>
+</tr>
+<!-- Row 2 (Zebra) -->
+<tr class="bg-[#3d3935]/[0.02] hover:bg-gray-50 transition-colors">
+<td class="p-table-cell-padding">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#e34b25]" data-icon="meeting_room">meeting_room</span>
+<div>
+<div class="font-h3 text-on-surface">Meeting Room "Apex"</div>
+<div class="text-[11px] text-secondary">8 Person Capacity</div>
+</div>
+</div>
+</td>
+<td class="p-table-cell-padding">
+<div>Oct 25, 2023</div>
+<div class="text-[11px] text-secondary">02:00 PM - 03:00 PM</div>
+</td>
+<td class="p-table-cell-padding">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>Floor 4 - Lobby East</span>
+</div>
+</td>
+<td class="p-table-cell-padding">
+<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-label-sm">Checked-in</span>
+</td>
+<td class="p-table-cell-padding text-right">
+<button class="text-secondary hover:text-[#e34b25] p-1"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="text-secondary hover:text-error p-1 ml-2"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="p-table-cell-padding">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#e34b25]" data-icon="desktop_windows">desktop_windows</span>
+<div>
+<div class="font-h3 text-on-surface">Desk 4-15</div>
+<div class="text-[11px] text-secondary">Dual Monitor Setup</div>
+</div>
+</div>
+</td>
+<td class="p-table-cell-padding">
+<div>Oct 27, 2023</div>
+<div class="text-[11px] text-secondary">09:00 AM - 06:00 PM</div>
+</td>
+<td class="p-table-cell-padding">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span>
+<span>Zone B (Quiet Zone)</span>
+</div>
+</td>
+<td class="p-table-cell-padding">
+<span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full font-label-sm">Pending</span>
+</td>
+<td class="p-table-cell-padding text-right">
+<button class="text-secondary hover:text-[#e34b25] p-1"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="text-secondary hover:text-error p-1 ml-2"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Recent Activity / News (Clean Panel) -->
+<div class="col-span-12 md:col-span-8 bg-white border border-[#d1d9dd] rounded-lg p-panel-gap">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-h3">Floor Updates</h3>
+<a class="font-label-md text-tertiary" href="#">View all</a>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4 items-start">
+<div class="w-10 h-10 rounded bg-orange-50 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[#e34b25]" data-icon="coffee">coffee</span>
+</div>
+<div>
+<div class="font-body-md font-semibold text-on-surface">Kitchen maintenance scheduled</div>
+<p class="font-body-sm text-secondary">Coffee machines on Floor 4 will be offline from 10:00 - 11:00 AM today for regular servicing.</p>
+<span class="text-[11px] text-gray-400 mt-1 block">2 hours ago</span>
+</div>
+</div>
+<div class="flex gap-4 items-start">
+<div class="w-10 h-10 rounded bg-blue-50 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary" data-icon="campaign">campaign</span>
+</div>
+<div>
+<div class="font-body-md font-semibold text-on-surface">New desk peripherals available</div>
+<p class="font-body-sm text-secondary">Noise-cancelling headsets and ergonomic mice are now available for check-out at the Resource Desk.</p>
+<span class="text-[11px] text-gray-400 mt-1 block">Yesterday</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Support Shortcut -->
+<div class="col-span-12 md:col-span-4 bg-[#3d3935] text-white border border-gray-800 rounded-lg p-panel-gap flex flex-col justify-between">
+<div>
+<h3 class="font-h3">Need help?</h3>
+<p class="text-gray-400 font-body-sm mt-2">Our facilities team is on standby to help with equipment or booking issues.</p>
+</div>
+<button class="mt-6 w-full border border-gray-600 text-white py-2 rounded-lg font-label-md hover:bg-white/5 transition-colors">
+                        Contact Support
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,32 @@
+{
+    "name": "Ufficio Roma",
+    "location": "Via del Poggio Laurentino, 9, 00144 Roma",
+    "floors": [
+      {
+        "floor_num": 1,
+        "floor_name": "Piano terra",
+        "floor_map": "floor-0-rm.webp",
+        "desks": [
+          {
+            "desk_num": 1,
+            "desk_name": "RM-OSD",
+            "seats": [{ "seat_num": 1 },{ "seat_num": 2 },{ "seat_num": 3 },{ "seat_num": 4 },{ "seat_num": 5 },{ "seat_num": 6 },{ "seat_num": 7 },{ "seat_num": 8 },
+                  { "seat_num": 9 },{ "seat_num": 10 },{ "seat_num": 11 },{ "seat_num": 12 },{ "seat_num": 13 },{ "seat_num": 14 },{ "seat_num": 15 },{ "seat_num": 16 }]
+          }
+        ]
+      },
+      {
+        "floor_num": 2,
+        "floor_name": "Primo piano",
+        "floor_map": "floor-1-rm.webp",
+        "desks": [
+          {
+            "desk_num": 1,
+            "desk_name": "RM-OS-1",
+            "seats": [{ "seat_num": 6 },{ "seat_num": 7 },{ "seat_num": 8 },{ "seat_num": 9 },{ "seat_num": 10 },{ "seat_num": 11 },{ "seat_num": 12 },{ "seat_num":  13},
+                  { "seat_num": 14 },{ "seat_num": 15 },{ "seat_num": 16 },{ "seat_num": 17 },{ "seat_num": 18 },{ "seat_num": 19 },{ "seat_num": 20 },{ "seat_num": 21 }]
+          }
+        ]
+      }
+    ]
+  }

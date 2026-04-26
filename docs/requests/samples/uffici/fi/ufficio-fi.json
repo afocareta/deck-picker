@@ -1,0 +1,18 @@
+{
+    "name": "Ufficio Firenze",
+    "location": "Viale Belfiore, 10, 50144 Firenze",
+    "floors": [
+      {
+        "floor_num": 1,
+        "floor_name": "Piano terra",
+        "floor_map": "floor-fi.webp",
+        "desks": [
+          {
+            "desk_num": 1,
+            "desk_name": "FI-DESK",
+            "seats": [{ "seat_num": 1 },{ "seat_num": 2 },{ "seat_num": 3 },{ "seat_num": 4 }]
+          }
+        ]
+      }
+    ]
+  }

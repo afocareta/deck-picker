@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ReservationStatus {
+  ACTIVE
+  CANCELLED
+}
+
+enum AuditAction {
+  USER_UPDATED
+  RESERVATION_CANCELLED
+}
+
+enum ResourceBlockType {
+  OFFICE
+  FLOOR
+  DESK
+  SEAT
+}
+
+model User {
+  id               String        @id @default(cuid())
+  email            String        @unique
+  name             String
+  role             UserRole      @default(USER)
+  assignedOfficeId String
+  assignedOffice   Office        @relation(fields: [assignedOfficeId], references: [id])
+  officeSelectedAt DateTime?
+  reservations     Reservation[]
+  auditLogsAuthored AuditLog[]    @relation("AuditLogActor")
+  auditLogsTargeted AuditLog[]    @relation("AuditLogTargetUser")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Office {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  location  String
+  floors    Floor[]
+  users     User[]
+  closures  OfficeClosure[]
+  resourceBlocks ResourceBlock[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Floor {
+  id        String @id @default(cuid())
+  officeId  String
+  office    Office @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  floorNum  Int
+  floorName String
+  floorMap  String
+  desks     Desk[]
+  resourceBlocks ResourceBlock[]
+
+  @@unique([officeId, floorNum])
+}
+
+model Desk {
+  id       String @id @default(cuid())
+  floorId  String
+  floor    Floor  @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  deskNum  Int
+  deskName String
+  seats    Seat[]
+  resourceBlocks ResourceBlock[]
+
+  @@unique([floorId, deskNum])
+}
+
+model Seat {
+  id           String        @id @default(cuid())
+  deskId       String
+  desk         Desk          @relation(fields: [deskId], references: [id], onDelete: Cascade)
+  seatNum      Int
+  reservations Reservation[]
+  resourceBlocks ResourceBlock[]
+
+  @@unique([deskId, seatNum])
+}
+
+model Reservation {
+  id          String            @id @default(cuid())
+  userId      String
+  user        User              @relation(fields: [userId], references: [id])
+  seatId      String
+  seat        Seat              @relation(fields: [seatId], references: [id])
+  date        DateTime
+  status      ReservationStatus @default(ACTIVE)
+  cancelledAt DateTime?
+  auditLogs   AuditLog[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([seatId, date, status])
+  @@index([userId, date, status])
+  @@index([date, status])
+}
+
+model AuditLog {
+  id            String      @id @default(cuid())
+  action        AuditAction
+  actorUserId   String
+  actorUser     User        @relation("AuditLogActor", fields: [actorUserId], references: [id])
+  targetUserId  String?
+  targetUser    User?       @relation("AuditLogTargetUser", fields: [targetUserId], references: [id])
+  reservationId String?
+  reservation   Reservation? @relation(fields: [reservationId], references: [id])
+  details       String
+  createdAt     DateTime    @default(now())
+
+  @@index([action, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([targetUserId, createdAt])
+  @@index([reservationId, createdAt])
+}
+
+model OfficeClosure {
+  id        String   @id @default(cuid())
+  officeId  String
+  office    Office   @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  date      DateTime
+  reason    String
+  createdAt DateTime @default(now())
+
+  @@unique([officeId, date])
+  @@index([date])
+}
+
+model ResourceBlock {
+  id        String            @id @default(cuid())
+  officeId  String
+  office    Office            @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  blockType ResourceBlockType
+  floorId   String?
+  floor     Floor?            @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  deskId    String?
+  desk      Desk?             @relation(fields: [deskId], references: [id], onDelete: Cascade)
+  seatId    String?
+  seat      Seat?             @relation(fields: [seatId], references: [id], onDelete: Cascade)
+  date      DateTime
+  reason    String
+  createdAt DateTime          @default(now())
+
+  @@index([officeId, date])
+  @@index([floorId, date])
+  @@index([deskId, date])
+  @@index([seatId, date])
+}

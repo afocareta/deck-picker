@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking Confirmation - Desk Picker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#8a1c00",
+                    "on-tertiary-container": "#fcfcff",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#f8dcd6",
+                    "on-primary-fixed": "#3c0700",
+                    "error": "#ba1a1a",
+                    "outline": "#8e7069",
+                    "secondary": "#625d59",
+                    "on-secondary-container": "#69635f",
+                    "secondary-container": "#e9e1db",
+                    "inverse-surface": "#3d2c28",
+                    "inverse-on-surface": "#ffede9",
+                    "surface-tint": "#b32902",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface-variant": "#5a413a",
+                    "tertiary": "#006192",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#91cdff",
+                    "on-surface": "#271814",
+                    "surface-bright": "#fff8f6",
+                    "surface": "#fff8f6",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#271814",
+                    "on-secondary-fixed": "#1e1b18",
+                    "on-primary-container": "#fffbff",
+                    "primary-fixed-dim": "#ffb4a2",
+                    "surface-container-low": "#fff1ed",
+                    "background": "#fff8f6",
+                    "on-tertiary-fixed": "#001e31",
+                    "secondary-fixed-dim": "#ccc5bf",
+                    "on-secondary-fixed-variant": "#4a4642",
+                    "primary-container": "#d3401a",
+                    "primary": "#b02700",
+                    "outline-variant": "#e3beb6",
+                    "surface-container-high": "#fee2dc",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#004b72",
+                    "surface-container-highest": "#f8dcd6",
+                    "surface-container": "#ffe9e4",
+                    "surface-dim": "#f0d4ce",
+                    "tertiary-container": "#007bb8",
+                    "secondary-fixed": "#e9e1db",
+                    "primary-fixed": "#ffdad2",
+                    "tertiary-fixed": "#cce5ff",
+                    "inverse-primary": "#ffb4a2",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-padding": "24px",
+                    "control-padding-y": "8px",
+                    "unit": "4px",
+                    "control-padding-x": "12px",
+                    "panel-gap": "16px",
+                    "table-cell-padding": "8px 12px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "h1": ["Inter"],
+                    "h2": ["Inter"],
+                    "label-md": ["Inter"],
+                    "h3": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fff8f6;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background antialiased">
+<!-- TopNavBar -->
+<nav class="bg-white dark:bg-gray-950 font-['Inter'] text-sm antialiased border-b border-gray-200 dark:border-gray-800 shadow-[0px_2px_4px_rgba(61,57,53,0.05)] flex justify-between items-center px-4 w-full h-14 fixed top-0 z-50">
+<div class="flex items-center gap-4">
+<span class="text-lg font-bold text-gray-900 dark:text-white">Desk Picker</span>
+<div class="hidden md:flex items-center gap-6 ml-8">
+<a class="text-orange-600 dark:text-orange-500 border-b-2 border-orange-600 px-1 py-4 h-14 flex items-center" href="#">Bookings</a>
+<a class="text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors px-1 py-4 h-14 flex items-center" href="#">Map</a>
+<a class="text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors px-1 py-4 h-14 flex items-center" href="#">Resources</a>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-full transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-full transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="p-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-full transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="ml-2 w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close-up professional headshot of a smiling office worker in a modern corporate setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_r5U6YjaWHShUdZD2rzU_DLTLswjYUzLg0MxaelXE8htEffyDzoWWmGno-OMoqcEGX6vjcpJqx3xXOF7RPT02nzyAqnfeSpQyk9EIq1aEyj4rTEvtr2mOm8_kU3LVG5_m_z4ms1W3Xm1rP7hhlngnjXNJ5fpcsLCljE07cdt5zkyRAq8RMWvsFqPibvxU7GRol9OE5HxbkezRMtMAaQ7TQQ99i9sUxw_2WciYF997Fml5CDDWAhbWfhLqwZAZXvVjCgZsOttDPiw"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-12 px-6 max-w-5xl mx-auto">
+<!-- Header Section -->
+<div class="mb-10 text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-primary mb-4">
+<span class="material-symbols-outlined !text-4xl" data-icon="task_alt">task_alt</span>
+</div>
+<h1 class="font-h1 text-h1 text-on-surface mb-2">Booking Processed</h1>
+<p class="font-body-md text-body-md text-secondary">Your reservation for Floor 4 – Zone B is partially confirmed.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Primary Status & Details -->
+<div class="lg:col-span-8 space-y-6">
+<!-- Partial Success Warning Panel -->
+<div class="bg-orange-50 border border-orange-200 rounded-xl p-5 flex gap-4">
+<span class="material-symbols-outlined text-orange-600 mt-0.5" data-icon="warning">warning</span>
+<div>
+<h3 class="font-h3 text-h3 text-orange-900 mb-1">Equipment Unavailable</h3>
+<p class="font-body-sm text-body-sm text-orange-800">
+                            The desk was successfully reserved, but the requested **dual-monitor setup** is currently undergoing maintenance. A standard single-monitor setup will be provided instead.
+                        </p>
+<div class="mt-3 flex gap-3">
+<button class="text-label-md font-label-md text-orange-900 underline hover:no-underline">Change Desk</button>
+<button class="text-label-md font-label-md text-orange-900 underline hover:no-underline">View Details</button>
+</div>
+</div>
+</div>
+<!-- Main Confirmation Bento Card -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-[0px_2px_4px_rgba(61,57,53,0.05)]">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Reference ID</span>
+<p class="font-h2 text-h2 text-on-surface">#DP-99210-XC</p>
+</div>
+<span class="bg-green-100 text-green-800 text-[11px] font-bold px-2.5 py-1 rounded-full uppercase">Confirmed</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-secondary">Date</p>
+<p class="font-body-md text-body-md font-semibold">Thursday, Oct 24, 2024</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-secondary">Time Slot</p>
+<p class="font-body-md text-body-md font-semibold">09:00 AM – 06:00 PM</p>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="desk">desk</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-secondary">Workstation</p>
+<p class="font-body-md text-body-md font-semibold">Desk 412 (Window Side)</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-secondary">Location</p>
+<p class="font-body-md text-body-md font-semibold">North Wing, Floor 4</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low px-6 py-4 flex justify-between items-center border-t border-outline-variant">
+<div class="flex -space-x-2">
+<img alt="Team member" class="w-6 h-6 rounded-full border-2 border-white" data-alt="Portrait of a male professional with glasses in a bright studio environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApyqKaTATr7ynmbucbHfAr0bj54NXtwMWSwIsy4auntEu9FyR1Vqxcl71vhpi1Rqyzoi2BtUGFMfYfSzLIu-iqsi-ozj2AWr8Fa1v2U_xVo9VVTVse4Eb_4HEoH2qe0O7X5bkpf9Zj97vWzJbbU1pqslSYpuOTumMrf6iBKekZt4yw0W6G1qaqwy2nMUlrRBXv0g9GD6w-t-taRhYb7Il1sUO-PWoydKYyDt9HoGpQJWr4xqV-EVdvxDuql2hQPr-p7FB6u0ynExQ"/>
+<img alt="Team member" class="w-6 h-6 rounded-full border-2 border-white" data-alt="Portrait of a female professional with curly hair in a professional creative studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8OVvV16Gm_SG7lOKe9nCAZm1Gkya5J8cEhdsQbXk3vztZcm0e3daEANVdoQa8s31Rw3gevg_Z3AQg5l79XSMkqs7aRcC4wWOwR4Uq_-zGxxRBio34JfeKp4EpFcRL8MRNLBu800a5TcCH041EhbYAtxmkqJwhAK2N2uUXghNY9-hZ4aQfdqVq5TkD2YZJRoTplXbpYe2j4xOaNtmj3iCTSrVGbnp7_QQcc9i7-to11qjuMxJavV12oCul2TD8okwjxKMnE6PRhr0"/>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[10px] font-bold">3+</div>
+</div>
+<p class="font-label-md text-label-md text-secondary">Sarah and 4 others are nearby</p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="flex-1 bg-primary text-on-primary font-label-md py-3 rounded-lg flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+<span class="material-symbols-outlined !text-xl" data-icon="event_repeat">event_repeat</span>
+                        Add to Calendar
+                    </button>
+<button class="flex-1 bg-[#3d3935] text-white font-label-md py-3 rounded-lg flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+<span class="material-symbols-outlined !text-xl" data-icon="share">share</span>
+                        Share Details
+                    </button>
+<button class="sm:w-14 h-12 border border-outline text-secondary rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="print">print</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Contextual Info -->
+<div class="lg:col-span-4 space-y-6">
+<!-- Map View Card -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-[0px_2px_4px_rgba(61,57,53,0.05)]">
+<div class="h-40 bg-gray-100 relative">
+<img class="w-full h-full object-cover opacity-50" data-alt="Minimalistic technical architectural floor plan with blue and orange highlights indicating workspace zones" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf0z9eV1qHBTLH7X95Vb533MGuO_1btt_DwfjGNcj5bLfkHsMS33mFD8xr2JZbyH2rY2XhFNr4AGjL23IdRd43-UIl1wr9QP-o1radJBeENHvH1cea-KeoWO15XJkfoo1X2OXHXGHeSwBnN7U0SGkTL1WXiDUPXfbr6T5D4HziZg-EVa2hBVo2FGjpfTuVyYElKSSQ3N45idfojKUbRRD_DpyFeflQinWkDnFfrC2fxJ_GUmNAvlYJARCGzVeo3N_ypT--reI1eV4"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative">
+<div class="absolute -top-8 -left-4 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-lg whitespace-nowrap">Your Desk</div>
+<span class="material-symbols-outlined text-primary !text-4xl drop-shadow-md" data-icon="location_on" data-weight="fill" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-h3 text-h3 mb-1">Wayfinding</h4>
+<p class="font-body-sm text-body-sm text-secondary">Exit elevator bank B, turn right. Desk 412 is located against the north window wall.</p>
+</div>
+</div>
+<!-- Amenities Status -->
+<div class="bg-white border border-outline-variant rounded-xl p-5 shadow-[0px_2px_4px_rgba(61,57,53,0.05)]">
+<h4 class="font-h3 text-h3 mb-4">Confirmed Amenities</h4>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary !text-lg" data-icon="wifi">wifi</span>
+<span class="font-body-sm text-body-sm">High-speed Wi-Fi</span>
+</div>
+<span class="material-symbols-outlined text-green-600 !text-lg" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary !text-lg" data-icon="power">power</span>
+<span class="font-body-sm text-body-sm">Power Outlet</span>
+</div>
+<span class="material-symbols-outlined text-green-600 !text-lg" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex items-center justify-between opacity-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary !text-lg" data-icon="monitor">monitor</span>
+<span class="font-body-sm text-body-sm">Dual Monitor</span>
+</div>
+<span class="material-symbols-outlined text-error !text-lg" data-icon="cancel">cancel</span>
+</div>
+</div>
+</div>
+<!-- Support Card -->
+<div class="bg-surface-container-high rounded-xl p-5 border border-outline-variant">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-primary" data-icon="support_agent">support_agent</span>
+<h4 class="font-h3 text-h3">Need help?</h4>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">If you need technical assistance or a different workspace, contact the Ops Team.</p>
+<button class="w-full bg-white border border-outline text-on-surface font-label-md py-2 rounded-lg hover:bg-gray-50 transition-colors active:scale-95">
+                        Contact Support
+                    </button>
+</div>
+</div>
+</div>
+<!-- Footer Navigation (BottomNavBar for Mobile) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 h-16 flex items-center justify-around px-2 z-50">
+<button class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined" data-icon="floor_plan">floor</span>
+<span class="text-[10px]">Map</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-orange-600 font-bold">
+<span class="material-symbols-outlined" data-icon="event_available" data-weight="fill" style="font-variation-settings: 'FILL' 1;">event_available</span>
+<span class="text-[10px]">Bookings</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[10px]">People</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-[10px]">Resources</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="text-[10px]">Analytics</span>
+</button>
+</div>
+</main>
+</body></html>
