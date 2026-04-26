@@ -54,36 +54,59 @@ async function findOpenDevUserDate(): Promise<string> {
   return toDateKey(openDate);
 }
 
+async function cancelActiveDevUserReservationForDate(dateKey: string): Promise<void> {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { email: DEV_USER_EMAIL },
+    select: { id: true },
+  });
+
+  await prisma.reservation.updateMany({
+    where: {
+      userId: user.id,
+      status: "ACTIVE",
+      date: new Date(`${dateKey}T00:00:00.000Z`),
+    },
+    data: {
+      status: "CANCELLED",
+      cancelledAt: new Date(),
+    },
+  });
+}
+
 test("books a spot and shows the reservation on the dashboard", async ({ page }) => {
   const bookingDate = await findOpenDevUserDate();
 
-  await page.goto("/auth/dev");
+  try {
+    await page.goto("/auth/dev");
 
-  await expect(page.getByRole("heading", { level: 1, name: "Dashboard" })).toBeVisible();
-  await page.getByRole("link", { name: "Book a Spot" }).first().click();
+    await expect(page.getByRole("heading", { level: 1, name: "Dashboard" })).toBeVisible();
+    await page.getByRole("link", { name: "Book a Spot" }).first().click();
 
-  await expect(page.getByRole("heading", { level: 1, name: "Book a Spot" })).toBeVisible();
-  await page.getByRole("textbox", { name: "Date" }).fill(bookingDate);
+    await expect(page.getByRole("heading", { level: 1, name: "Book a Spot" })).toBeVisible();
+    await page.getByRole("textbox", { name: "Date" }).fill(bookingDate);
 
-  await page.getByRole("button", { name: "Continue to Desk Selection" }).click();
+    await page.getByRole("button", { name: "Continue to Desk Selection" }).click();
 
-  await expect(page.getByRole("heading", { name: "Select Workspace" })).toBeVisible();
-  await page.getByRole("button", { name: "Auto-assign" }).click();
+    await expect(page.getByRole("heading", { name: "Select Workspace" })).toBeVisible();
+    await page.getByRole("button", { name: "Auto-assign" }).click();
 
-  await expect(page.getByRole("heading", { name: "Confirmation" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Booked dates" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Confirmation" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Booked dates" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Dashboard" }).last().click();
+    await page.getByRole("link", { name: "Dashboard" }).last().click();
 
-  await expect(page.getByRole("heading", { level: 1, name: "Dashboard" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Dashboard" })).toBeVisible();
 
-  const upcomingReservations = page.getByRole("region", {
-    name: "Upcoming Reservations",
-  });
+    const upcomingReservations = page.getByRole("region", {
+      name: "Upcoming Reservations",
+    });
 
-  await expect(
-    upcomingReservations.getByRole("button", { name: /Cancel reservation for/ }).first(),
-  ).toBeVisible();
-  await expect(upcomingReservations).toContainText(formatDashboardDate(bookingDate));
-  await expect(upcomingReservations).toContainText(/Seat \d+/);
+    await expect(
+      upcomingReservations.getByRole("button", { name: /Cancel reservation for/ }).first(),
+    ).toBeVisible();
+    await expect(upcomingReservations).toContainText(formatDashboardDate(bookingDate));
+    await expect(upcomingReservations).toContainText(/Seat \d+/);
+  } finally {
+    await cancelActiveDevUserReservationForDate(bookingDate);
+  }
 });
