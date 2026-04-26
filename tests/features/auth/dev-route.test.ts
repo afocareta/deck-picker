@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { describe, expect, test } from "vitest";
 
 import { GET } from "../../../src/app/auth/dev/route";
+import { GET as GET_ADMIN } from "../../../src/app/auth/dev/admin/route";
 import {
   SESSION_COOKIE_NAME,
   getSessionSecret,
@@ -35,5 +36,20 @@ describe("dev auth route", () => {
     expect(sessionSetCookie).toBeTruthy();
     expect(sessionSetCookie).not.toContain("Max-Age=");
     expect(sessionSetCookie).not.toContain("Expires=");
+  });
+
+  test("creates a signed dev admin session", async () => {
+    const response = await GET_ADMIN(new NextRequest("http://127.0.0.1:3000/auth/dev/admin"));
+    const setCookie = response.headers.getSetCookie().join("\n");
+    const sessionCookie = /desk_picker_session=([^;]+)/.exec(setCookie)?.[1];
+
+    expect(response.status).toBe(307);
+    expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/admin");
+    expect(
+      verifySessionCookieValue({
+        value: sessionCookie,
+        secret: getSessionSecret(),
+      })?.email,
+    ).toBe("dev.admin@example.com");
   });
 });

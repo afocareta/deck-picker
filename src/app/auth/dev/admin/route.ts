@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { DEV_USER_EMAIL, getDevUser } from "@/features/dev-user/dev-user";
+import { DEV_ADMIN_EMAIL, getDevUser } from "@/features/dev-user/dev-user";
 import {
   SESSION_COOKIE_NAME,
   createSessionCookieValue,
@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(appRedirectUrl("/login", request));
   }
 
-  const user = await getDevUser(DEV_USER_EMAIL);
-  const response = NextResponse.redirect(appRedirectUrl("/dashboard", request));
+  const user = await getDevUser(DEV_ADMIN_EMAIL);
+  const response = NextResponse.redirect(appRedirectUrl("/admin", request));
 
   response.cookies.set(
     SESSION_COOKIE_NAME,

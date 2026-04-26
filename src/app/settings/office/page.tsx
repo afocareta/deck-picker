@@ -1,4 +1,5 @@
 import { Building2, Check, MapPinned } from "lucide-react";
+import { redirect } from "next/navigation";
 
 import { changeOfficeAction } from "@/app/settings/office/actions";
 import { AppShell } from "@/components/app-shell";
@@ -21,6 +22,10 @@ export default async function OfficeSettingsPage({ searchParams }: OfficeSetting
     getSelectableOffices(),
     searchParams,
   ]);
+
+  if (!user) {
+    redirect("/login");
+  }
 
   return (
     <AppShell

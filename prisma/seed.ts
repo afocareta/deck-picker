@@ -95,6 +95,23 @@ async function seed() {
       officeSelectedAt: new Date(),
     },
   });
+
+  await prisma.user.upsert({
+    where: { email: "dev.admin@example.com" },
+    update: {
+      name: "Dev Admin",
+      role: "ADMIN",
+      assignedOfficeId: milanoOffice.id,
+      officeSelectedAt: new Date(),
+    },
+    create: {
+      email: "dev.admin@example.com",
+      name: "Dev Admin",
+      role: "ADMIN",
+      assignedOfficeId: milanoOffice.id,
+      officeSelectedAt: new Date(),
+    },
+  });
 }
 
 seed()

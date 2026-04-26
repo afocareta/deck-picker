@@ -28,15 +28,18 @@ Open:
 http://localhost:3000
 ```
 
-The root route redirects to `/dashboard`. The fixed MVP user is:
+The root route redirects to `/dashboard`, and authenticated pages redirect to
+`/login` when there is no app session. Local development users are:
 
 ```text
 dev.user@example.com
+dev.admin@example.com
 ```
 
 Google login routes are present too. If `GOOGLE_CLIENT_ID` and
 `GOOGLE_CLIENT_SECRET` are configured, `/login` can start the Google OAuth
-flow; otherwise the local dev fallback remains available.
+flow; otherwise the local dev and admin fallbacks remain available from the
+login page.
 
 ## Verify
 
@@ -56,7 +59,8 @@ Implemented:
 - Import of the five complete offices: Milano, Cosenza, Firenze, Roma, Torino.
 - Static floor plan assets under `public/offices/`.
 - Dev user assigned to Milano.
-- Signed session cookie, local dev auth route, login page, logout, and Google OAuth route scaffolding.
+- Dev admin assigned to Milano.
+- Signed session cookie, local dev/admin auth routes, login page, logout, and Google OAuth route scaffolding.
 - Browser-session-only app session cookie.
 - Hosted-domain validation for Google profiles when `GOOGLE_HOSTED_DOMAIN` is configured.
 - Admin role assignment from configured admin email list.

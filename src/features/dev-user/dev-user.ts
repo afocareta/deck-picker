@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
 export const DEV_USER_EMAIL = "dev.user@example.com";
+export const DEV_ADMIN_EMAIL = "dev.admin@example.com";
 
-export async function getDevUser() {
+export async function getDevUser(email = DEV_USER_EMAIL) {
   return prisma.user.findUniqueOrThrow({
-    where: { email: DEV_USER_EMAIL },
+    where: { email },
     include: {
       assignedOffice: {
         select: {

@@ -14,6 +14,10 @@ export async function selectOfficeAction(formData: FormData) {
 
   const user = await getCurrentUser();
 
+  if (!user) {
+    redirect("/login");
+  }
+
   await selectUserOffice({
     userId: user.id,
     officeId,

@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 
-import { getDevUser } from "@/features/dev-user/dev-user";
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -17,7 +16,7 @@ export async function getCurrentUser() {
   });
 
   if (!session) {
-    return getDevUser();
+    return undefined;
   }
 
   const user = await prisma.user.findUnique({
@@ -34,5 +33,5 @@ export async function getCurrentUser() {
     },
   });
 
-  return user ?? getDevUser();
+  return user ?? undefined;
 }

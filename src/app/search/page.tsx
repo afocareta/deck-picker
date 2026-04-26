@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Armchair, Building2, CalendarCheck, UserRound } from "lucide-react";
+import { redirect } from "next/navigation";
 
 import { changeOfficeAction } from "@/app/settings/office/actions";
 import { AppShell } from "@/components/app-shell";
@@ -44,6 +45,11 @@ function ResultSection({
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
+
+  if (!user) {
+    redirect("/login");
+  }
+
   const query = params.q ?? "";
   const results = await searchWorkspace({
     query,

@@ -53,6 +53,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             >
               Use local dev fallback
             </Link>
+            <Link
+              href="/auth/dev/admin"
+              className="inline-flex min-h-12 items-center justify-center rounded-md border border-[var(--color-border-strong)] bg-white px-4 text-sm font-semibold text-[var(--color-text)] hover:bg-[var(--color-surface-muted)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+            >
+              Use local admin fallback
+            </Link>
           </div>
         </div>
       </section>

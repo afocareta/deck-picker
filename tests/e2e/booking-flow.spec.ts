@@ -11,6 +11,12 @@ test.beforeAll(() => {
   execFileSync("npm", ["run", "db:seed"], { stdio: "inherit" });
 });
 
+test("redirects unauthenticated users to login", async ({ page }) => {
+  await page.goto("/dashboard");
+
+  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+});
+
 function toDateKey(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
@@ -51,7 +57,7 @@ async function findOpenDevUserDate(): Promise<string> {
 test("books a spot and shows the reservation on the dashboard", async ({ page }) => {
   const bookingDate = await findOpenDevUserDate();
 
-  await page.goto("/dashboard");
+  await page.goto("/auth/dev");
 
   await expect(page.getByRole("heading", { level: 1, name: "Dashboard" })).toBeVisible();
   await page.getByRole("link", { name: "Book a Spot" }).first().click();

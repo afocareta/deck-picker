@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import {
   autoAssignAndBook,
@@ -57,6 +58,10 @@ function parseDateKeys(dateKeys: string[]): Date[] {
 
 async function assertCurrentUserOffice(officeId: string) {
   const user = await getCurrentUser();
+
+  if (!user) {
+    throw new Error("Authentication required");
+  }
 
   if (user.assignedOffice.id !== officeId) {
     throw new Error("Office is not assigned to this user");
@@ -121,6 +126,10 @@ export async function cancelReservationAction(formData: FormData) {
   }
 
   const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   await cancelReservation({
     userId: user.id,

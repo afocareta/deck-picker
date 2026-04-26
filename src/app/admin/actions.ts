@@ -14,6 +14,10 @@ import { getCurrentUser } from "@/features/auth/current-user";
 async function assertCurrentAdmin() {
   const user = await getCurrentUser();
 
+  if (!user) {
+    redirect("/login");
+  }
+
   if (user.role !== "ADMIN") {
     throw new Error("Admin access required");
   }

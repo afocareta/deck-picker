@@ -13,6 +13,10 @@ function toShellRole(role: "USER" | "ADMIN") {
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 
+  if (!user) {
+    redirect("/login");
+  }
+
   if (!user.officeSelectedAt) {
     redirect("/select-office");
   }

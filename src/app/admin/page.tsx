@@ -36,6 +36,10 @@ function parseDateParam(value: string | undefined) {
 export default async function AdminPage({ searchParams }: AdminPageProps) {
   const user = await getCurrentUser();
 
+  if (!user) {
+    redirect("/login");
+  }
+
   if (user.role !== "ADMIN") {
     redirect("/dashboard");
   }

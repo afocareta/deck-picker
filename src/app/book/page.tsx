@@ -15,6 +15,10 @@ function toShellRole(role: "USER" | "ADMIN") {
 export default async function BookPage() {
   const user = await getCurrentUser();
 
+  if (!user) {
+    redirect("/login");
+  }
+
   if (!user.officeSelectedAt) {
     redirect("/select-office");
   }

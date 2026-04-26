@@ -13,9 +13,13 @@ export async function changeOfficeAction(formData: FormData) {
     redirect("/settings/office?error=Office is required");
   }
 
-  try {
-    const user = await getCurrentUser();
+  const user = await getCurrentUser();
 
+  if (!user) {
+    redirect("/login");
+  }
+
+  try {
     await selectUserOffice({
       userId: user.id,
       officeId,
