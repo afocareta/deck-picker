@@ -81,7 +81,8 @@ async function findConflict(
   const officeClosure = await prisma.officeClosure.findFirst({
     where: {
       officeId: seat.desk.floor.officeId,
-      date,
+      startDate: { lte: date },
+      endDate: { gte: date },
     },
     select: { id: true },
   });
@@ -93,7 +94,8 @@ async function findConflict(
   const resourceBlock = await prisma.resourceBlock.findFirst({
     where: {
       officeId: seat.desk.floor.officeId,
-      date,
+      startDate: { lte: date },
+      endDate: { gte: date },
       OR: [
         { blockType: "OFFICE" },
         { blockType: "FLOOR", floorId: seat.desk.floor.id },

@@ -213,7 +213,8 @@ describe("booking service", () => {
     await prisma.officeClosure.create({
       data: {
         officeId: office.id,
-        date,
+        startDate: date,
+        endDate: date,
         reason: "Company holiday",
       },
     });
@@ -242,7 +243,8 @@ describe("booking service", () => {
         officeId: office.id,
         blockType: "SEAT",
         seatId: seats[0].id,
-        date,
+        startDate: date,
+        endDate: date,
         reason: "Broken monitor",
       },
     });
@@ -260,6 +262,80 @@ describe("booking service", () => {
 
     expect(result.booked).toEqual([]);
     expect(result.skipped).toEqual([{ date: isoDate(date), reason: "Resource unavailable" }]);
+  });
+
+  test("office closure range blocks availability and booking for every date in the range", async () => {
+    const { office, seats } = await createOfficeFixture("office-closure-range");
+    const user = await createUser("office-closure-range-user", office.id);
+    const [firstDate, secondDate, thirdDate] = bookableDates(3);
+
+    await prisma.officeClosure.create({
+      data: {
+        officeId: office.id,
+        startDate: firstDate,
+        endDate: secondDate,
+        reason: "Company event",
+      },
+    });
+
+    const availability = await getSeatAvailability({ officeId: office.id, dates: [firstDate, secondDate, thirdDate] });
+    expect(availability.every((seat) => seat.dates[isoDate(firstDate)] === "blocked")).toBe(true);
+    expect(availability.every((seat) => seat.dates[isoDate(secondDate)] === "blocked")).toBe(true);
+    expect(availability.every((seat) => seat.dates[isoDate(thirdDate)] === "available")).toBe(true);
+
+    const result = await bookSelectedSeat({
+      userId: user.id,
+      officeId: office.id,
+      seatId: seats[0].id,
+      dates: [firstDate, secondDate, thirdDate],
+    });
+
+    expect(result.booked).toEqual([{ date: isoDate(thirdDate), reservationId: expect.any(String) }]);
+    expect(result.skipped).toEqual([
+      { date: isoDate(firstDate), reason: "Office closed" },
+      { date: isoDate(secondDate), reason: "Office closed" },
+    ]);
+  });
+
+  test("desk resource block range blocks matching seats for every date in the range", async () => {
+    const { office, seats } = await createOfficeFixture("desk-block-range");
+    const user = await createUser("desk-block-range-user", office.id);
+    const [firstDate, secondDate, thirdDate] = bookableDates(3);
+
+    const blockedSeat = await prisma.seat.findUniqueOrThrow({
+      where: { id: seats[0].id },
+      include: { desk: true },
+    });
+
+    await prisma.resourceBlock.create({
+      data: {
+        officeId: office.id,
+        blockType: "DESK",
+        deskId: blockedSeat.deskId,
+        startDate: firstDate,
+        endDate: secondDate,
+        reason: "Desk maintenance",
+      },
+    });
+
+    const availability = await getSeatAvailability({ officeId: office.id, dates: [firstDate, secondDate, thirdDate] });
+    expect(availability.find((seat) => seat.seatId === seats[0].id)?.dates[isoDate(firstDate)]).toBe("blocked");
+    expect(availability.find((seat) => seat.seatId === seats[1].id)?.dates[isoDate(secondDate)]).toBe("blocked");
+    expect(availability.find((seat) => seat.seatId === seats[0].id)?.dates[isoDate(thirdDate)]).toBe("available");
+    expect(availability.find((seat) => seat.seatId === seats[3].id)?.dates[isoDate(firstDate)]).toBe("available");
+
+    const result = await bookSelectedSeat({
+      userId: user.id,
+      officeId: office.id,
+      seatId: seats[0].id,
+      dates: [firstDate, secondDate, thirdDate],
+    });
+
+    expect(result.booked).toEqual([{ date: isoDate(thirdDate), reservationId: expect.any(String) }]);
+    expect(result.skipped).toEqual([
+      { date: isoDate(firstDate), reason: "Resource unavailable" },
+      { date: isoDate(secondDate), reason: "Resource unavailable" },
+    ]);
   });
 
   test("cancelling a future reservation frees the seat", async () => {

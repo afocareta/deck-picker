@@ -19,6 +19,10 @@ enum ReservationStatus {
 enum AuditAction {
   USER_UPDATED
   RESERVATION_CANCELLED
+  OFFICE_CLOSURE_CREATED
+  OFFICE_CLOSURE_REMOVED
+  RESOURCE_BLOCK_CREATED
+  RESOURCE_BLOCK_REMOVED
 }
 
 enum ResourceBlockType {
@@ -132,12 +136,13 @@ model OfficeClosure {
   id        String   @id @default(cuid())
   officeId  String
   office    Office   @relation(fields: [officeId], references: [id], onDelete: Cascade)
-  date      DateTime
+  startDate DateTime
+  endDate   DateTime
   reason    String
   createdAt DateTime @default(now())
 
-  @@unique([officeId, date])
-  @@index([date])
+  @@index([officeId, startDate, endDate])
+  @@index([startDate, endDate])
 }
 
 model ResourceBlock {
@@ -151,12 +156,13 @@ model ResourceBlock {
   desk      Desk?             @relation(fields: [deskId], references: [id], onDelete: Cascade)
   seatId    String?
   seat      Seat?             @relation(fields: [seatId], references: [id], onDelete: Cascade)
-  date      DateTime
+  startDate DateTime
+  endDate   DateTime
   reason    String
   createdAt DateTime          @default(now())
 
-  @@index([officeId, date])
-  @@index([floorId, date])
-  @@index([deskId, date])
-  @@index([seatId, date])
+  @@index([officeId, startDate, endDate])
+  @@index([floorId, startDate, endDate])
+  @@index([deskId, startDate, endDate])
+  @@index([seatId, startDate, endDate])
 }

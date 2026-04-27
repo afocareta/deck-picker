@@ -2,14 +2,30 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import type { ResourceBlockType } from "@prisma/client";
 
 import {
   cancelReservationAsAdmin,
-  createOfficeClosure,
-  createResourceBlock,
+  confirmOfficeClosure,
+  confirmResourceBlock,
+  previewOfficeClosureImpact,
+  previewResourceBlockImpact,
+  removeOfficeClosure,
+  removeResourceBlock,
   updateUserAdminFields,
 } from "@/features/admin/admin-service";
 import { getCurrentUser } from "@/features/auth/current-user";
+
+export type AvailabilityActionState =
+  | { ok: true; message: string }
+  | { ok: false; error: string }
+  | null;
+
+export type AvailabilityPreviewState =
+  | Awaited<ReturnType<typeof previewOfficeClosureImpact>>
+  | Awaited<ReturnType<typeof previewResourceBlockImpact>>
+  | { ok: false; error: string }
+  | null;
 
 async function assertCurrentAdmin() {
   const user = await getCurrentUser();
@@ -37,6 +53,58 @@ function parseDateField(value: FormDataEntryValue | null) {
   }
 
   return date;
+}
+
+function parseTextField(formData: FormData, name: string, label: string) {
+  const value = formData.get(name);
+
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new Error(`${label} is required`);
+  }
+
+  return value.trim();
+}
+
+function parseRange(formData: FormData) {
+  return {
+    startDate: parseDateField(formData.get("startDate")),
+    endDate: parseDateField(formData.get("endDate")),
+  };
+}
+
+function parseBlockInput(formData: FormData) {
+  const officeId = parseTextField(formData, "officeId", "Office");
+  const blockType = formData.get("blockType");
+  const targetId = formData.get("targetId");
+  const reason = parseTextField(formData, "reason", "Reason");
+
+  if (blockType !== "OFFICE" && blockType !== "FLOOR" && blockType !== "DESK" && blockType !== "SEAT") {
+    throw new Error("Block type is required");
+  }
+
+  if (blockType !== "OFFICE" && (typeof targetId !== "string" || targetId.length === 0)) {
+    throw new Error("Target is required");
+  }
+
+  const typedBlockType: ResourceBlockType = blockType;
+
+  return {
+    officeId,
+    blockType: typedBlockType,
+    reason,
+    ...parseRange(formData),
+    floorId: typedBlockType === "FLOOR" ? String(targetId) : undefined,
+    deskId: typedBlockType === "DESK" ? String(targetId) : undefined,
+    seatId: typedBlockType === "SEAT" ? String(targetId) : undefined,
+  };
+}
+
+function parseClosureInput(formData: FormData) {
+  return {
+    officeId: parseTextField(formData, "officeId", "Office"),
+    reason: parseTextField(formData, "reason", "Reason"),
+    ...parseRange(formData),
+  };
 }
 
 export async function updateUserAdminAction(formData: FormData) {
@@ -92,74 +160,94 @@ export async function cancelReservationAdminAction(formData: FormData) {
   redirect("/admin?tab=reservations&success=Reservation cancelled");
 }
 
-export async function createOfficeClosureAction(formData: FormData) {
+export async function previewOfficeClosureAction(
+  _previousState: AvailabilityPreviewState,
+  formData: FormData,
+): Promise<AvailabilityPreviewState> {
   try {
     await assertCurrentAdmin();
-
-    const officeId = formData.get("officeId");
-    const reason = formData.get("reason");
-
-    if (typeof officeId !== "string" || officeId.length === 0) {
-      throw new Error("Office is required");
-    }
-
-    if (typeof reason !== "string" || reason.trim().length === 0) {
-      throw new Error("Reason is required");
-    }
-
-    await createOfficeClosure({
-      officeId,
-      date: parseDateField(formData.get("date")),
-      reason: reason.trim(),
-    });
-
-    revalidatePath("/admin");
+    return previewOfficeClosureImpact(parseClosureInput(formData));
   } catch (error) {
-    redirect(`/admin?tab=availability&error=${encodeURIComponent(error instanceof Error ? error.message : "Closure failed")}`);
+    return { ok: false, error: error instanceof Error ? error.message : "Closure preview failed" };
   }
-
-  redirect("/admin?tab=availability&success=Office closure saved");
 }
 
-export async function createResourceBlockAction(formData: FormData) {
+export async function confirmOfficeClosureAction(
+  _previousState: AvailabilityActionState,
+  formData: FormData,
+): Promise<AvailabilityActionState> {
   try {
-    await assertCurrentAdmin();
-
-    const officeId = formData.get("officeId");
-    const blockType = formData.get("blockType");
-    const targetId = formData.get("targetId");
-    const reason = formData.get("reason");
-
-    if (typeof officeId !== "string" || officeId.length === 0) {
-      throw new Error("Office is required");
-    }
-
-    if (blockType !== "OFFICE" && blockType !== "FLOOR" && blockType !== "DESK" && blockType !== "SEAT") {
-      throw new Error("Block type is required");
-    }
-
-    if (blockType !== "OFFICE" && (typeof targetId !== "string" || targetId.length === 0)) {
-      throw new Error("Target is required");
-    }
-
-    if (typeof reason !== "string" || reason.trim().length === 0) {
-      throw new Error("Reason is required");
-    }
-
-    await createResourceBlock({
-      officeId,
-      blockType,
-      date: parseDateField(formData.get("date")),
-      reason: reason.trim(),
-      floorId: blockType === "FLOOR" ? String(targetId) : undefined,
-      deskId: blockType === "DESK" ? String(targetId) : undefined,
-      seatId: blockType === "SEAT" ? String(targetId) : undefined,
-    });
+    const admin = await assertCurrentAdmin();
+    const result = await confirmOfficeClosure({ actorUserId: admin.id, ...parseClosureInput(formData) });
 
     revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/book");
+    revalidatePath("/search");
+    return { ok: true, message: `Office closure saved. ${result.cancelledReservations.length} reservations cancelled.` };
   } catch (error) {
-    redirect(`/admin?tab=availability&error=${encodeURIComponent(error instanceof Error ? error.message : "Resource block failed")}`);
+    return { ok: false, error: error instanceof Error ? error.message : "Closure failed" };
+  }
+}
+
+export async function previewResourceBlockAction(
+  _previousState: AvailabilityPreviewState,
+  formData: FormData,
+): Promise<AvailabilityPreviewState> {
+  try {
+    await assertCurrentAdmin();
+    return previewResourceBlockImpact(parseBlockInput(formData));
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Resource block preview failed" };
+  }
+}
+
+export async function confirmResourceBlockAction(
+  _previousState: AvailabilityActionState,
+  formData: FormData,
+): Promise<AvailabilityActionState> {
+  try {
+    const admin = await assertCurrentAdmin();
+    const result = await confirmResourceBlock({ actorUserId: admin.id, ...parseBlockInput(formData) });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/book");
+    revalidatePath("/search");
+    return { ok: true, message: `Resource block saved. ${result.cancelledReservations.length} reservations cancelled.` };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Resource block failed" };
+  }
+}
+
+export async function removeOfficeClosureAction(formData: FormData) {
+  try {
+    const admin = await assertCurrentAdmin();
+    const closureId = parseTextField(formData, "closureId", "Closure");
+
+    await removeOfficeClosure({ actorUserId: admin.id, closureId });
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/book");
+  } catch (error) {
+    redirect(`/admin?tab=availability&error=${encodeURIComponent(error instanceof Error ? error.message : "Remove closure failed")}`);
   }
 
-  redirect("/admin?tab=availability&success=Resource block saved");
+  redirect("/admin?tab=availability&success=Office closure removed");
+}
+
+export async function removeResourceBlockAction(formData: FormData) {
+  try {
+    const admin = await assertCurrentAdmin();
+    const blockId = parseTextField(formData, "blockId", "Resource block");
+
+    await removeResourceBlock({ actorUserId: admin.id, blockId });
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/book");
+  } catch (error) {
+    redirect(`/admin?tab=availability&error=${encodeURIComponent(error instanceof Error ? error.message : "Remove resource block failed")}`);
+  }
+
+  redirect("/admin?tab=availability&success=Resource block removed");
 }

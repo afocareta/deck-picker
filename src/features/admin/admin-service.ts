@@ -1,4 +1,4 @@
-import { AuditAction, ReservationStatus, type UserRole } from "@prisma/client";
+import { AuditAction, ReservationStatus, type ResourceBlockType, type UserRole } from "@prisma/client";
 
 import { toDateKey } from "@/features/booking/availability";
 import { normalizeDate } from "@/features/booking/date-rules";
@@ -50,7 +50,8 @@ export type AdminDashboard = {
   closures: Array<{
     id: string;
     officeName: string;
-    date: string;
+    startDate: string;
+    endDate: string;
     reason: string;
   }>;
   resourceBlocks: Array<{
@@ -58,7 +59,8 @@ export type AdminDashboard = {
     officeName: string;
     blockType: string;
     targetName: string;
-    date: string;
+    startDate: string;
+    endDate: string;
     reason: string;
   }>;
   resourceTargets: Array<{
@@ -68,6 +70,97 @@ export type AdminDashboard = {
     label: string;
   }>;
 };
+
+export type AffectedReservation = {
+  id: string;
+  date: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  officeName: string;
+  floorName: string;
+  deskName: string;
+  seatNum: number;
+};
+
+type DateRangeInput = {
+  startDate: Date;
+  endDate: Date;
+  now?: Date;
+};
+
+type ResourceBlockInput = DateRangeInput & {
+  officeId: string;
+  reason: string;
+  blockType: ResourceBlockType;
+  floorId?: string;
+  deskId?: string;
+  seatId?: string;
+};
+
+type OfficeClosureInput = DateRangeInput & {
+  officeId: string;
+  reason: string;
+};
+
+function addUtcDays(date: Date, days: number) {
+  return new Date(normalizeDate(date).getTime() + days * 24 * 60 * 60 * 1000);
+}
+
+function assertWeekdayRange(input: DateRangeInput) {
+  const startDate = normalizeDate(input.startDate);
+  const endDate = normalizeDate(input.endDate);
+  const today = normalizeDate(input.now ?? new Date());
+
+  if (startDate > endDate) {
+    throw new Error("Invalid date range");
+  }
+
+  if (startDate <= today) {
+    throw new Error("Invalid date range");
+  }
+
+  for (let date = startDate; date <= endDate; date = addUtcDays(date, 1)) {
+    const day = date.getUTCDay();
+
+    if (day === 0 || day === 6) {
+      throw new Error("Closing days can only be set for weekdays");
+    }
+  }
+
+  return { startDate, endDate };
+}
+
+function normalizeAffectedReservation(
+  reservation: {
+    id: string;
+    date: Date;
+    userId: string;
+    user: { email: string; name: string };
+    seat: {
+      seatNum: number;
+      desk: {
+        deskName: string;
+        floor: {
+          floorName: string;
+          office: { name: string };
+        };
+      };
+    };
+  },
+): AffectedReservation {
+  return {
+    id: reservation.id,
+    date: toDateKey(reservation.date),
+    userId: reservation.userId,
+    userEmail: reservation.user.email,
+    userName: reservation.user.name,
+    officeName: reservation.seat.desk.floor.office.name,
+    floorName: reservation.seat.desk.floor.floorName,
+    deskName: reservation.seat.desk.deskName,
+    seatNum: reservation.seat.seatNum,
+  };
+}
 
 export async function getAdminDashboard(input: {
   officeId?: string;
@@ -155,8 +248,8 @@ export async function getAdminDashboard(input: {
     }),
     prisma.officeClosure.findMany({
       include: { office: true },
-      where: { date: { gte: today } },
-      orderBy: { date: "asc" },
+      where: { endDate: { gte: today } },
+      orderBy: { startDate: "asc" },
       take: 50,
     }),
     prisma.resourceBlock.findMany({
@@ -166,8 +259,8 @@ export async function getAdminDashboard(input: {
         desk: true,
         seat: { include: { desk: true } },
       },
-      where: { date: { gte: today } },
-      orderBy: { date: "asc" },
+      where: { endDate: { gte: today } },
+      orderBy: { startDate: "asc" },
       take: 50,
     }),
     prisma.floor.findMany({
@@ -252,7 +345,8 @@ export async function getAdminDashboard(input: {
     closures: closures.map((closure) => ({
       id: closure.id,
       officeName: closure.office.name,
-      date: toDateKey(closure.date),
+      startDate: toDateKey(closure.startDate),
+      endDate: toDateKey(closure.endDate),
       reason: closure.reason,
     })),
     resourceBlocks: resourceBlocks.map((block) => ({
@@ -269,7 +363,8 @@ export async function getAdminDashboard(input: {
               : block.seat
                 ? `${block.seat.desk.deskName} / Seat ${block.seat.seatNum}`
                 : "Unknown seat",
-      date: toDateKey(block.date),
+      startDate: toDateKey(block.startDate),
+      endDate: toDateKey(block.endDate),
       reason: block.reason,
     })),
     resourceTargets: [
@@ -313,36 +408,25 @@ export async function getAdminDashboard(input: {
   };
 }
 
-export async function createOfficeClosure(input: {
-  officeId: string;
-  date: Date;
-  reason: string;
-}) {
-  return prisma.officeClosure.upsert({
+async function affectedReservationsForOfficeClosure(input: OfficeClosureInput): Promise<AffectedReservation[]> {
+  const { startDate, endDate } = assertWeekdayRange(input);
+  const reservations = await prisma.reservation.findMany({
     where: {
-      officeId_date: {
-        officeId: input.officeId,
-        date: normalizeDate(input.date),
-      },
+      status: ReservationStatus.ACTIVE,
+      date: { gte: startDate, lte: endDate },
+      seat: { desk: { floor: { officeId: input.officeId } } },
     },
-    update: { reason: input.reason },
-    create: {
-      officeId: input.officeId,
-      date: normalizeDate(input.date),
-      reason: input.reason,
+    include: {
+      user: true,
+      seat: { include: { desk: { include: { floor: { include: { office: true } } } } } },
     },
+    orderBy: [{ date: "asc" }, { user: { email: "asc" } }],
   });
+
+  return reservations.map(normalizeAffectedReservation);
 }
 
-export async function createResourceBlock(input: {
-  officeId: string;
-  date: Date;
-  reason: string;
-  blockType: "OFFICE" | "FLOOR" | "DESK" | "SEAT";
-  floorId?: string;
-  deskId?: string;
-  seatId?: string;
-}) {
+async function assertResourceTarget(input: ResourceBlockInput) {
   if (input.blockType === "FLOOR") {
     const floor = input.floorId
       ? await prisma.floor.findFirst({ where: { id: input.floorId, officeId: input.officeId }, select: { id: true } })
@@ -378,6 +462,265 @@ export async function createResourceBlock(input: {
       throw new Error("Seat does not belong to selected office");
     }
   }
+}
+
+function resourceReservationWhere(input: ResourceBlockInput) {
+  return {
+    status: ReservationStatus.ACTIVE,
+    seat: { desk: { floor: { officeId: input.officeId } } },
+    OR:
+      input.blockType === "OFFICE"
+        ? undefined
+        : input.blockType === "FLOOR"
+          ? [{ seat: { desk: { floorId: input.floorId } } }]
+          : input.blockType === "DESK"
+            ? [{ seat: { deskId: input.deskId } }]
+            : [{ seatId: input.seatId }],
+  };
+}
+
+async function affectedReservationsForResourceBlock(input: ResourceBlockInput): Promise<AffectedReservation[]> {
+  const { startDate, endDate } = assertWeekdayRange(input);
+  await assertResourceTarget(input);
+  const reservations = await prisma.reservation.findMany({
+    where: {
+      ...resourceReservationWhere(input),
+      date: { gte: startDate, lte: endDate },
+    },
+    include: {
+      user: true,
+      seat: { include: { desk: { include: { floor: { include: { office: true } } } } } },
+    },
+    orderBy: [{ date: "asc" }, { user: { email: "asc" } }],
+  });
+
+  return reservations.map(normalizeAffectedReservation);
+}
+
+export async function previewOfficeClosureImpact(input: OfficeClosureInput) {
+  const { startDate, endDate } = assertWeekdayRange(input);
+
+  return {
+    type: "OFFICE_CLOSURE" as const,
+    officeId: input.officeId,
+    startDate: toDateKey(startDate),
+    endDate: toDateKey(endDate),
+    reason: input.reason,
+    affectedReservations: await affectedReservationsForOfficeClosure(input),
+  };
+}
+
+export async function previewResourceBlockImpact(input: ResourceBlockInput) {
+  const { startDate, endDate } = assertWeekdayRange(input);
+
+  return {
+    type: "RESOURCE_BLOCK" as const,
+    officeId: input.officeId,
+    blockType: input.blockType,
+    targetId: input.blockType === "FLOOR" ? input.floorId : input.blockType === "DESK" ? input.deskId : input.blockType === "SEAT" ? input.seatId : "",
+    startDate: toDateKey(startDate),
+    endDate: toDateKey(endDate),
+    reason: input.reason,
+    affectedReservations: await affectedReservationsForResourceBlock(input),
+  };
+}
+
+export async function confirmOfficeClosure(input: OfficeClosureInput & { actorUserId: string }) {
+  const { startDate, endDate } = assertWeekdayRange(input);
+  const affectedReservations = await affectedReservationsForOfficeClosure(input);
+  const reservationIds = affectedReservations.map((reservation) => reservation.id);
+  const now = input.now ?? new Date();
+
+  return prisma.$transaction(async (tx) => {
+    const period = await tx.officeClosure.create({
+      data: {
+        officeId: input.officeId,
+        startDate,
+        endDate,
+        reason: input.reason,
+      },
+    });
+
+    if (reservationIds.length > 0) {
+      await tx.reservation.updateMany({
+        where: { id: { in: reservationIds }, status: ReservationStatus.ACTIVE },
+        data: { status: ReservationStatus.CANCELLED, cancelledAt: now },
+      });
+    }
+
+    await tx.auditLog.create({
+      data: {
+        action: AuditAction.OFFICE_CLOSURE_CREATED,
+        actorUserId: input.actorUserId,
+        details: JSON.stringify({
+          closureId: period.id,
+          officeId: input.officeId,
+          startDate: toDateKey(startDate),
+          endDate: toDateKey(endDate),
+          reason: input.reason,
+          cancelledReservationCount: reservationIds.length,
+        }),
+      },
+    });
+
+    await Promise.all(
+      affectedReservations.map((reservation) =>
+        tx.auditLog.create({
+          data: {
+            action: AuditAction.RESERVATION_CANCELLED,
+            actorUserId: input.actorUserId,
+            targetUserId: reservation.userId,
+            reservationId: reservation.id,
+            details: JSON.stringify({
+              reason: "Office closure",
+              closureId: period.id,
+              date: reservation.date,
+            }),
+          },
+        }),
+      ),
+    );
+
+    return { period, cancelledReservations: affectedReservations };
+  });
+}
+
+export async function confirmResourceBlock(input: ResourceBlockInput & { actorUserId: string }) {
+  const { startDate, endDate } = assertWeekdayRange(input);
+  await assertResourceTarget(input);
+  const affectedReservations = await affectedReservationsForResourceBlock(input);
+  const reservationIds = affectedReservations.map((reservation) => reservation.id);
+  const now = input.now ?? new Date();
+
+  return prisma.$transaction(async (tx) => {
+    const period = await tx.resourceBlock.create({
+      data: {
+        officeId: input.officeId,
+        blockType: input.blockType,
+        floorId: input.floorId,
+        deskId: input.deskId,
+        seatId: input.seatId,
+        startDate,
+        endDate,
+        reason: input.reason,
+      },
+    });
+
+    if (reservationIds.length > 0) {
+      await tx.reservation.updateMany({
+        where: { id: { in: reservationIds }, status: ReservationStatus.ACTIVE },
+        data: { status: ReservationStatus.CANCELLED, cancelledAt: now },
+      });
+    }
+
+    await tx.auditLog.create({
+      data: {
+        action: AuditAction.RESOURCE_BLOCK_CREATED,
+        actorUserId: input.actorUserId,
+        details: JSON.stringify({
+          blockId: period.id,
+          officeId: input.officeId,
+          blockType: input.blockType,
+          floorId: input.floorId,
+          deskId: input.deskId,
+          seatId: input.seatId,
+          startDate: toDateKey(startDate),
+          endDate: toDateKey(endDate),
+          reason: input.reason,
+          cancelledReservationCount: reservationIds.length,
+        }),
+      },
+    });
+
+    await Promise.all(
+      affectedReservations.map((reservation) =>
+        tx.auditLog.create({
+          data: {
+            action: AuditAction.RESERVATION_CANCELLED,
+            actorUserId: input.actorUserId,
+            targetUserId: reservation.userId,
+            reservationId: reservation.id,
+            details: JSON.stringify({
+              reason: "Resource unavailable",
+              blockId: period.id,
+              date: reservation.date,
+            }),
+          },
+        }),
+      ),
+    );
+
+    return { period, cancelledReservations: affectedReservations };
+  });
+}
+
+export async function removeOfficeClosure(input: { actorUserId: string; closureId: string; now?: Date }) {
+  const today = normalizeDate(input.now ?? new Date());
+  const closure = await prisma.officeClosure.findUniqueOrThrow({ where: { id: input.closureId } });
+
+  if (closure.endDate <= today) {
+    throw new Error("Only future closure periods can be removed");
+  }
+
+  await prisma.$transaction([
+    prisma.officeClosure.delete({ where: { id: input.closureId } }),
+    prisma.auditLog.create({
+      data: {
+        action: AuditAction.OFFICE_CLOSURE_REMOVED,
+        actorUserId: input.actorUserId,
+        details: JSON.stringify({
+          closureId: input.closureId,
+          officeId: closure.officeId,
+          startDate: toDateKey(closure.startDate),
+          endDate: toDateKey(closure.endDate),
+          reason: closure.reason,
+        }),
+      },
+    }),
+  ]);
+}
+
+export async function removeResourceBlock(input: { actorUserId: string; blockId: string; now?: Date }) {
+  const today = normalizeDate(input.now ?? new Date());
+  const block = await prisma.resourceBlock.findUniqueOrThrow({ where: { id: input.blockId } });
+
+  if (block.endDate <= today) {
+    throw new Error("Only future resource block periods can be removed");
+  }
+
+  await prisma.$transaction([
+    prisma.resourceBlock.delete({ where: { id: input.blockId } }),
+    prisma.auditLog.create({
+      data: {
+        action: AuditAction.RESOURCE_BLOCK_REMOVED,
+        actorUserId: input.actorUserId,
+        details: JSON.stringify({
+          blockId: input.blockId,
+          officeId: block.officeId,
+          blockType: block.blockType,
+          floorId: block.floorId,
+          deskId: block.deskId,
+          seatId: block.seatId,
+          startDate: toDateKey(block.startDate),
+          endDate: toDateKey(block.endDate),
+          reason: block.reason,
+        }),
+      },
+    }),
+  ]);
+}
+
+export async function createOfficeClosure(input: OfficeClosureInput) {
+  const { startDate, endDate } = assertWeekdayRange(input);
+
+  return prisma.officeClosure.create({
+    data: { officeId: input.officeId, startDate, endDate, reason: input.reason },
+  });
+}
+
+export async function createResourceBlock(input: ResourceBlockInput) {
+  const { startDate, endDate } = assertWeekdayRange(input);
+  await assertResourceTarget(input);
 
   return prisma.resourceBlock.create({
     data: {
@@ -386,7 +729,8 @@ export async function createResourceBlock(input: {
       floorId: input.floorId,
       deskId: input.deskId,
       seatId: input.seatId,
-      date: normalizeDate(input.date),
+      startDate,
+      endDate,
       reason: input.reason,
     },
   });

@@ -21,12 +21,34 @@ export function toDateKey(date: Date): string {
   return normalizeDate(date).toISOString().slice(0, 10);
 }
 
+function overlapsAnyDate(input: { startDate: Date; endDate: Date; dateKeys: Set<string> }) {
+  for (
+    let current = normalizeDate(input.startDate);
+    current <= normalizeDate(input.endDate);
+    current = new Date(current.getTime() + 24 * 60 * 60 * 1000)
+  ) {
+    if (input.dateKeys.has(toDateKey(current))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function includesDate(input: { startDate: Date; endDate: Date; dateKey: string }) {
+  const date = new Date(`${input.dateKey}T00:00:00.000Z`);
+  return normalizeDate(input.startDate) <= date && date <= normalizeDate(input.endDate);
+}
+
 export async function getSeatAvailability({
   officeId,
   dates,
 }: GetSeatAvailabilityInput): Promise<SeatAvailability[]> {
   const normalizedDates = dates.map(normalizeDate);
   const dateKeys = normalizedDates.map(toDateKey);
+  const dateKeySet = new Set(dateKeys);
+  const minDate = normalizedDates.toSorted((left, right) => left.getTime() - right.getTime())[0];
+  const maxDate = normalizedDates.toSorted((left, right) => right.getTime() - left.getTime())[0];
 
   const seats = await prisma.seat.findMany({
     where: { desk: { floor: { officeId } } },
@@ -50,14 +72,23 @@ export async function getSeatAvailability({
     activeReservations.map((reservation) => `${reservation.seatId}:${toDateKey(reservation.date)}`),
   );
   const closures = await prisma.officeClosure.findMany({
-    where: { officeId, date: { in: normalizedDates } },
-    select: { date: true },
+    where: {
+      officeId,
+      ...(minDate && maxDate ? { startDate: { lte: maxDate }, endDate: { gte: minDate } } : {}),
+    },
+    select: { startDate: true, endDate: true },
   });
-  const closedDates = new Set(closures.map((closure) => toDateKey(closure.date)));
+  const overlappingClosures = closures.filter((closure) =>
+    overlapsAnyDate({ startDate: closure.startDate, endDate: closure.endDate, dateKeys: dateKeySet }),
+  );
   const resourceBlocks = await prisma.resourceBlock.findMany({
-    where: { officeId, date: { in: normalizedDates } },
+    where: {
+      officeId,
+      ...(minDate && maxDate ? { startDate: { lte: maxDate }, endDate: { gte: minDate } } : {}),
+    },
     select: {
-      date: true,
+      startDate: true,
+      endDate: true,
       blockType: true,
       floorId: true,
       deskId: true,
@@ -71,12 +102,12 @@ export async function getSeatAvailability({
     deskId: string;
     seatId: string;
   }) {
-    if (closedDates.has(input.dateKey)) {
+    if (overlappingClosures.some((closure) => includesDate({ ...closure, dateKey: input.dateKey }))) {
       return true;
     }
 
     return resourceBlocks.some((block) => {
-      if (toDateKey(block.date) !== input.dateKey) {
+      if (!includesDate({ startDate: block.startDate, endDate: block.endDate, dateKey: input.dateKey })) {
         return false;
       }
 
